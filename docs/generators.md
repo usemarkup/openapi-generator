@@ -93,6 +93,7 @@ The following generators are available:
     - [nodejs-server](generators/nodejs-server.md)
     - [php-laravel](generators/php-laravel.md)
     - [php-lumen](generators/php-lumen.md)
+    - [php-markup](generators/php-markup.md)
     - [php-silex](generators/php-silex.md)
     - [php-slim](generators/php-slim.md)
     - [php-symfony](generators/php-symfony.md)
