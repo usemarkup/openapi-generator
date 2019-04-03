@@ -305,7 +305,8 @@ public class PhpMarkupServerCodegen extends AbstractPhpCodegen implements Codege
         additionalProperties.put("testsDirName", testsDirName);
 
 		// make naming lamdas available
-        addMustacheLambdas(additionalProperties);
+        additionalProperties.put("titlecase", new TitlecaseLambda());
+        //addMustacheLambdas(additionalProperties);
 
         final String configDir = "Resources" + File.separator + "config";
         final String dependencyInjectionDir = "DependencyInjection";
