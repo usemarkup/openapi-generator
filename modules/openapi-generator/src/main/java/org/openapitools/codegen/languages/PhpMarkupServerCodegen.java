@@ -19,6 +19,9 @@ package org.openapitools.codegen.languages;
 
 import com.google.common.collect.ImmutableMap;
 import com.samskivert.mustache.Mustache;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.Paths;
+import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.Schema;
 import org.apache.commons.lang3.StringUtils;
@@ -306,16 +309,21 @@ public class PhpMarkupServerCodegen extends AbstractPhpCodegen implements Codege
 
 		// make naming lamdas available
         additionalProperties.put("titlecase", new TitlecaseLambda());
-        //addMustacheLambdas(additionalProperties);
+        additionalProperties.put("lowercase", new LowercaseLambda());
+        additionalProperties.put("uppercase", new UppercaseLambda());
+        additionalProperties.put("joinwithcomma", new JoinWithCommaLambda());
 
         final String configDir = "Resources" + File.separator + "config";
         final String dependencyInjectionDir = "DependencyInjection";
 
-        supportingFiles.add(new SupportingFile("Controller.mustache", toSrcPath(controllerPackage, srcBasePath), "Controller.php"));
+        //supportingFiles.add(new SupportingFile("Controller.mustache", toSrcPath(controllerPackage, srcBasePath), "Controller.php"));
         supportingFiles.add(new SupportingFile("Bundle.mustache", "", bundleClassName + ".php"));
         supportingFiles.add(new SupportingFile("Extension.mustache", dependencyInjectionDir, bundleExtensionName + ".php"));
         supportingFiles.add(new SupportingFile("ApiPass.mustache", dependencyInjectionDir + File.separator + "Compiler", bundleName + "ApiPass.php"));
         supportingFiles.add(new SupportingFile("ApiServer.mustache", toSrcPath(apiPackage, srcBasePath), "ApiServer.php"));
+        supportingFiles.add(new SupportingFile("api_messages.mustache", "", "ApiMessages.php.dist"));
+        supportingFiles.add(new SupportingFile("api_handlers.mustache", "", "ApiMessageHandlers.php.dist"));
+        supportingFiles.add(new SupportingFile("api_neomerx_schemas.mustache", "", "ApiNeomerxSchemas.php.dist"));
 
         // Serialization components
         supportingFiles.add(new SupportingFile("serialization/SerializerInterface.mustache", toSrcPath(servicePackage, srcBasePath), "SerializerInterface.php"));
@@ -360,24 +368,6 @@ public class PhpMarkupServerCodegen extends AbstractPhpCodegen implements Codege
                             "string"
                     )
             );
-        }
-    }
-    private void addMustacheLambdas(Map<String, Object> objs) {
-
-        Map<String, Mustache.Lambda> lambdas = new ImmutableMap.Builder<String, Mustache.Lambda>()
-                .put("lowercase", new LowercaseLambda().generator(this))
-                .put("uppercase", new UppercaseLambda())
-                .put("titlecase", new TitlecaseLambda())
-                .put("camelcase", new CamelCaseLambda().generator(this))
-                .build();
-
-        if (objs.containsKey("lambda")) {
-            LOGGER.warn("A property named 'lambda' already exists. Mustache lambdas renamed from 'lambda' to '_lambda'. " +
-                    "You'll likely need to use a custom template, " +
-                    "see https://github.com/swagger-api/swagger-codegen#modifying-the-client-library-format. ");
-            objs.put("_lambda", lambdas);
-        } else {
-            objs.put("lambda", lambdas);
         }
     }
 
@@ -436,6 +426,10 @@ public class PhpMarkupServerCodegen extends AbstractPhpCodegen implements Codege
             if (op.authMethods != null) {
                 authMethods.addAll(op.authMethods);
             }
+
+
+			// add srcBasePath
+			op.vendorExtensions.put("x-srcBasePath", srcBasePath);
         }
 
         operations.put("authMethods", authMethods);
