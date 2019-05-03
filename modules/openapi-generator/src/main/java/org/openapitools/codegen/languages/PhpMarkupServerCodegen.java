@@ -235,7 +235,7 @@ public class PhpMarkupServerCodegen extends AbstractPhpCodegen implements Codege
 
     @Override
     public String getHelp() {
-        return "Generates a PHP Symfony server bundle.";
+        return "Generates a Markup PHP Symfony server stub bundle.";
     }
 
     @Override
